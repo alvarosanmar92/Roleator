@@ -1,6 +1,13 @@
 // Array para almacenar la información del personaje
 let personaje = {};
 
+// Función para mostrar el mensaje final y cambiar la interfaz
+function mostrarMensajeFinal() {
+    // Ocultar el botón y mostrar el mensaje final
+    document.querySelector('button').style.display = 'none';
+    document.getElementById('mensajeFinal').style.display = 'block';
+}
+
 // Función principal para la creación del personaje
 function crearPersonaje() {
     // Capturar datos del usuario a través de prompts
@@ -131,7 +138,7 @@ function mostrarResumen(personaje) {
     let confirmacionFinal = confirm("¿Estás contento con tu personaje?\n\nAceptar para comenzar tu aventura con este personaje, Cancelar para reiniciar el proceso.");
 
     if (confirmacionFinal) {
-        alert("¡Bienvenido a tu aventura! Tu personaje está listo para empezar.");
+       mostrarMensajeFinal();
     } else {
         // Reiniciar el proceso
         crearPersonaje();
