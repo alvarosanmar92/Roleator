@@ -1,72 +1,59 @@
-// Array para almacenar la información del personaje
-let personaje = {};
+// Función principal para la creación del personaje
+function iniciarCreacion() {
+    // Ocultar contenedor de bienvenida
+    document.getElementById('welcome-container').style.display = 'none';
 
-// Función para mostrar el mensaje final y cambiar la interfaz
-function mostrarMensajeFinal() {
-    // Ocultar el botón y mostrar el mensaje final
-    document.querySelector('button').style.display = 'none';
-    document.getElementById('mensajeFinal').style.display = 'block';
+    // Mostrar contenedor de creación
+    document.getElementById('creation-container').style.display = 'block';
 }
 
-// Función principal para la creación del personaje
 function crearPersonaje() {
-    // Capturar datos del usuario a través de prompts
-    personaje.nombre = prompt("Ingresa el nombre del personaje:");
-    personaje.genero = prompt("Ingresa el género del personaje (Femenino, Masculino, No Binario):");
+    // Capturar datos del usuario a través de inputs
+    let nombre = document.getElementById('nombre').value;
+    let genero = document.getElementById('genero').value;
+    let edad = parseInt(document.getElementById('edad').value);
+    let clase = document.getElementById('clase').value;
+    let arma = document.getElementById('arma').value;
+    let companion = document.getElementById('companion').value;
 
     // Validar opciones de género
-    while (!validarGenero(personaje.genero)) {
+    if (!validarGenero(genero)) {
         alert("Error: El género ingresado no es válido. Por favor, elige entre Femenino, Masculino o No Binario.");
-        personaje.genero = prompt("Ingresa el género del personaje (Femenino, Masculino, No Binario):");
+        return;
     }
-
-    personaje.edad = parseInt(prompt("Ingresa la edad del personaje (10-80):"));
 
     // Validar rango de edad
-    while (isNaN(personaje.edad) || personaje.edad < 10 || personaje.edad > 80) {
+    if (isNaN(edad) || edad < 10 || edad > 80) {
         alert("Error: La edad ingresada no es válida. Por favor, ingresa un número entre 10 y 80.");
-        personaje.edad = parseInt(prompt("Ingresa la edad del personaje (10-80):"));
+        return;
     }
-
-    personaje.clase = prompt("Ingresa la clase del personaje (Bárbaro, Samurái, Erudito, Mago, Sanador, Asesino, Bufón):");
 
     // Validar opciones de clase
-    while (!validarClase(personaje.clase)) {
+    if (!validarClase(clase)) {
         alert("Error: La clase ingresada no es válida. Por favor, elige entre Bárbaro, Samurái, Erudito, Mago, Sanador, Asesino o Bufón.");
-        personaje.clase = prompt("Ingresa la clase del personaje (Bárbaro, Samurái, Erudito, Mago, Sanador, Asesino, Bufón):");
+        return;
     }
-
-    // Mostrar habilidades asociadas a la clase
-    alert("Habilidades asociadas a la clase " + personaje.clase + ":\n\n" + obtenerHabilidades(personaje.clase).join(", "));
-
-    // Confirmar o cambiar la elección de clase
-    let confirmacionClase = confirm("Has elegido la clase " + personaje.clase + ". ¿Quieres confirmar esta elección?\n\nAceptar para confirmar, Cancelar para cambiar la clase.");
-
-    if (!confirmacionClase) {
-        personaje.clase = prompt("Ingresa la nueva clase del personaje (Bárbaro, Samurái, Erudito, Mago, Sanador, Asesino, Bufón):");
-
-        // Validar opciones de clase nuevamente
-        while (!validarClase(personaje.clase)) {
-            alert("Error: La clase ingresada no es válida. Por favor, elige entre Bárbaro, Samurái, Erudito, Mago, Sanador, Asesino o Bufón.");
-            personaje.clase = prompt("Ingresa la nueva clase del personaje (Bárbaro, Samurái, Erudito, Mago, Sanador, Asesino, Bufón):");
-        }
-    }
-
-    personaje.arma = prompt("Ingresa el tipo de arma del personaje (Espada, Arco, Vara Mágica, Daga, Martillo):");
 
     // Validar opciones de arma
-    while (!validarArma(personaje.arma)) {
+    if (!validarArma(arma)) {
         alert("Error: El tipo de arma ingresado no es válido. Por favor, elige entre Espada, Arco, Vara Mágica, Daga o Martillo.");
-        personaje.arma = prompt("Ingresa el tipo de arma del personaje (Espada, Arco, Vara Mágica, Daga, Martillo):");
+        return;
     }
 
-    personaje.companion = prompt("Ingresa el nombre del acompañante del personaje:");
-
     // Clasificar edad
-    personaje.clasificacionEdad = clasificarEdad(personaje.edad);
+    let clasificacionEdad = clasificarEdad(edad);
 
-    // Mostrar resumen del personaje a través de alert
-    mostrarResumen(personaje);
+    // Mostrar resumen del personaje
+    mostrarResumen(nombre, genero, clasificacionEdad, clase, arma, companion);
+
+    // Almacenar datos en el almacenamiento local
+    guardarDatosEnStorage(nombre, genero, edad, clase, arma, companion);
+
+    // Ocultar contenedor de creación
+    document.getElementById('creation-container').style.display = 'none';
+
+    // Mostrar contenedor final
+    document.getElementById('final-container').style.display = 'block';
 }
 
 // Función para validar opciones de género
@@ -99,53 +86,52 @@ function clasificarEdad(edad) {
     }
 }
 
-// Función para obtener las habilidades de una clase
-function obtenerHabilidades(clase) {
-    switch (clase) {
-        case "Bárbaro":
-            return ["Fuerza bruta", "Defensa Personal"];
-        case "Samurái":
-            return ["Calma placentera", "Corte maestro"];
-        case "Erudito":
-            return ["Resolvedor de problemas", "Sabiduría ancestral"];
-        case "Mago":
-            return ["Chispa final", "Hielo fatuo"];
-        case "Sanador":
-            return ["Cántico sanador", "Resucitación de fénix"];
-        case "Asesino":
-            return ["Muerte silenciosa", "Pincho venenoso"];
-        case "Bufón":
-            return ["Cántico calmante", "Influencia máxima"];
-        default:
-            return [];
-    }
+// Función para mostrar el resumen del personaje
+function mostrarResumen(nombre, genero, clasificacionEdad, clase, arma, companion) {
+    // Crear elemento de resumen
+    let resumenContainer = document.createElement('div');
+    resumenContainer.id = 'resumen-container';
+
+    // Crear elementos de resumen
+    let resumenTitle = document.createElement('h2');
+    resumenTitle.textContent = 'Resumen del Personaje:';
+
+    let resumenText = document.createElement('p');
+    resumenText.textContent =
+        'Nombre: ' + nombre + '\n' +
+        'Género: ' + genero + '\n' +
+        'Edad: ' + clasificacionEdad + '\n' +
+        'Clase: ' + clase + '\n' +
+        'Tipo de Arma: ' + arma + '\n' +
+        'Acompañante: ' + companion;
+
+    // Agregar elementos al contenedor de resumen
+    resumenContainer.appendChild(resumenTitle);
+    resumenContainer.appendChild(resumenText);
+
+    // Obtener contenedor final y agregar el resumen
+    let finalContainer = document.getElementById('final-container');
+    finalContainer.appendChild(resumenContainer);
 }
 
-// Función de alert
-function mostrarResumen(personaje) {
-    let resumen = "Resumen del Personaje:\n\n" +
-                  "Nombre: " + personaje.nombre + "\n" +
-                  "Género: " + personaje.genero + "\n" +
-                  "Edad: " + personaje.clasificacionEdad + "\n" +
-                  "Clase: " + personaje.clase + "\n" +
-                  "Habilidades: " + obtenerHabilidades(personaje.clase).join(", ") + "\n" +
-                  "Tipo de Arma: " + personaje.arma + "\n" +
-                  "Acompañante: " + personaje.companion;
+// Función para guardar datos en el almacenamiento local
+function guardarDatosEnStorage(nombre, genero, edad, clase, arma, companion) {
+    let personaje = {
+        nombre: nombre,
+        genero: genero,
+        edad: edad,
+        clase: clase,
+        arma: arma,
+        companion: companion
+    };
 
-    alert(resumen);
-
-    // Confirmación final
-    let confirmacionFinal = confirm("¿Estás contento con tu personaje?\n\nAceptar para comenzar tu aventura con este personaje, Cancelar para reiniciar el proceso.");
-
-    if (confirmacionFinal) {
-       mostrarMensajeFinal();
-    } else {
-        // Reiniciar el proceso
-        crearPersonaje();
-    }
+    // Convertir a cadena JSON y guardar en el almacenamiento local
+    localStorage.setItem('personaje', JSON.stringify(personaje));
 }
 
-// Función para iniciar la creación de personaje desde el botón del HTML
-function iniciarCreacionPersonaje() {
-    crearPersonaje();
-}
+// Ejecutar la función de inicio al cargar la página
+window.onload = function () {
+    document.getElementById('creation-container').style.display = 'none';
+    document.getElementById('final-container').style.display = 'none';
+};
+
