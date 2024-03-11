@@ -1,23 +1,50 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <script src="index.js"></script>
-    <link rel="stylesheet" href="styles/style.css">
-    <title>Simulador de Personajes - Creación de Personaje</title>
+    <title>Simulador de Personajes</title>
 </head>
+
 <body>
- 
-    <h1>Bienvenido al comienzo de tu aventura</h1>
-    <p>Bienvenido a la creación de tu personaje</p>
 
-    <button onclick="iniciarCreacionPersonaje()">Comenzar</button>
-
-    <div id="mensajeFinal" style="display: none">
-    <h2>Tu personaje está preparado para comenzar la aventura.</h2>
-    <p>Allá vamos...</p>
+    <div class="container" id="welcome-container">
+        <h1>Bienvenido al comienzo de tu aventura</h1>
+        <p>Bienvenido a la creación de tu personaje</p>
+        <button onclick="iniciarCreacion()">Comenzar</button>
     </div>
+
+    <div class="container" id="creation-container" style="display:none;">
+        <h2>Completa la información de tu personaje:</h2>
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" required>
+
+        <label for="genero">Género (Femenino, Masculino, No Binario):</label>
+        <input type="text" id="genero" required>
+
+        <label for="edad">Edad (10-80):</label>
+        <input type="number" id="edad" min="10" max="80" required>
+
+        <label for="clase">Clase (Bárbaro, Samurái, Erudito, Mago, Sanador, Asesino, Bufón):</label>
+        <input type="text" id="clase" required>
+
+        <label for="arma">Tipo de Arma (Espada, Arco, Vara Mágica, Daga, Martillo):</label>
+        <input type="text" id="arma" required>
+
+        <label for="companion">Nombre del Acompañante:</label>
+        <input type="text" id="companion" required>
+
+        <button onclick="crearPersonaje()">Crear Personaje</button>
+    </div>
+
+    <div class="container" id="final-container" style="display:none;">
+        <h2>Tu personaje está preparado para comenzar la aventura</h2>
+        <p>Allá vamos...</p>
+    </div>
+
+    <script src="index.js"></script>
 </body>
+
 </html>
