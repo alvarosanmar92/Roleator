@@ -1,122 +1,129 @@
-// Función principal para la creación del personaje
-function iniciarCreacion() {
-    // Ocultar contenedor de bienvenida
-    document.getElementById('welcome-container').style.display = 'none';
+$(document).ready(function() {
+    $('#creation-container').hide();
+    $('#final-container').hide();
 
-    // Mostrar contenedor de creación
-    document.getElementById('creation-container').style.display = 'block';
+    $('#crear-desde-cero').click(function() {
+        iniciarCreacion();
+    });
+
+    $('#usar-personaje').click(function() {
+        cargarPersonajes();
+    });
+
+    $('#crear-personaje').click(function() {
+        crearPersonaje();
+    });
+
+    $('#restart-button').click(function() {
+        reiniciarProceso();
+    });
+});
+
+function iniciarCreacion() {
+    $('#welcome-container').hide();
+    $('#creation-container').show();
+}
+
+function cargarPersonajes() {
+    $('#welcome-container').hide();
+    $('#use-character-container').show();
+
+    $.getJSON('personajes.json', function(data) {
+        $.each(data, function(key, personaje) {
+            var button = $('<button></button>').text(personaje.nombre).click(function() {
+                mostrarDetalles(personaje);
+            });
+            $('#characters-list').append(button);
+        });
+    });
+}
+
+function mostrarDetalles(personaje) {
+    $('#detalles-personaje').empty();
+    $('#detalles-personaje').append('<h2>' + personaje.nombre + '</h2>');
+    $('#detalles-personaje').append('<p>Género: ' + personaje.genero + '</p>');
+    // Agregar más detalles según sea necesario (edad, clase, arma, etc.)
 }
 
 function crearPersonaje() {
-    // Capturar datos del usuario a través de inputs
-    let nombre = document.getElementById('nombre').value;
-    let genero = document.getElementById('genero').value;
-    let edad = parseInt(document.getElementById('edad').value);
-    let clase = document.getElementById('clase').value;
-    let arma = document.getElementById('arma').value;
-    let companion = document.getElementById('companion').value;
+    var nombre = $('#nombre').val();
+    var genero = $('#genero').val();
+    var edad = parseInt($('#edad').val());
+    var clase = $('#clase').val();
+    var arma = $('#arma').val();
+    var companion = $('#companero').val();
 
-    // Validar opciones de género
+    // Validaciones
     if (!validarGenero(genero)) {
         alert("Error: El género ingresado no es válido. Por favor, elige entre Femenino, Masculino o No Binario.");
         return;
     }
 
-    // Validar rango de edad
     if (isNaN(edad) || edad < 10 || edad > 80) {
         alert("Error: La edad ingresada no es válida. Por favor, ingresa un número entre 10 y 80.");
         return;
     }
 
-    // Validar opciones de clase
     if (!validarClase(clase)) {
         alert("Error: La clase ingresada no es válida. Por favor, elige entre Bárbaro, Samurái, Erudito, Mago, Sanador, Asesino o Bufón.");
         return;
     }
 
-    // Validar opciones de arma
     if (!validarArma(arma)) {
         alert("Error: El tipo de arma ingresado no es válido. Por favor, elige entre Espada, Arco, Vara Mágica, Daga o Martillo.");
         return;
     }
 
-    // Clasificar edad
-    let clasificacionEdad = clasificarEdad(edad);
+    // Operaciones adicionales...
 
-    // Mostrar resumen del personaje
-    mostrarResumen(nombre, genero, clasificacionEdad, clase, arma, companion);
+    mostrarResumen(nombre, genero, edad, clase, arma, companion);
 
-    // Almacenar datos en el almacenamiento local
-    guardarDatosEnStorage(nombre, genero, edad, clase, arma, companion);
+    // Guardar el personaje en el almacenamiento local
+    guardarPersonajeEnStorage(nombre, genero, edad, clase, arma, companion);
 
-    // Ocultar contenedor de creación
-    document.getElementById('creation-container').style.display = 'none';
-
-    // Mostrar contenedor final
-    document.getElementById('final-container').style.display = 'block';
+    $('#creation-container').hide();
+    $('#final-container').show();
 }
 
-// Función para validar opciones de género
+function reiniciarProceso() {
+    $('#final-container').hide();
+    $('#creation-container').show();
+}
+
 function validarGenero(genero) {
     return ["Femenino", "Masculino", "No Binario"].includes(genero);
 }
 
-// Función para validar opciones de clase
 function validarClase(clase) {
     return ["Bárbaro", "Samurái", "Erudito", "Mago", "Sanador", "Asesino", "Bufón"].includes(clase);
 }
 
-// Función para validar opciones de arma
 function validarArma(arma) {
     return ["Espada", "Arco", "Vara Mágica", "Daga", "Martillo"].includes(arma);
 }
 
-// Función para clasificar la edad
-function clasificarEdad(edad) {
-    if (edad >= 10 && edad <= 20) {
-        return "Adolescente";
-    } else if (edad > 20 && edad <= 35) {
-        return "Joven";
-    } else if (edad > 35 && edad <= 50) {
-        return "Senior";
-    } else if (edad > 50 && edad <= 80) {
-        return "Anciano";
-    } else {
-        return "Edad no clasificada";
-    }
+function mostrarResumen(nombre, genero, edad, clase, arma, companion) {
+    var resumenContainer = $('<div></div>').attr('id', 'resumen-container');
+    var resumenTitle = $('<h2></h2>').text('Resumen del Personaje:').css('font-weight', 'bold');
+    var resumenText = $('<p></p>').html(
+        'Nombre: ' + nombre + '<br>' +
+        'Género: ' + genero + '<br>' +
+        'Edad: ' + edad + '<br>' +
+        'Clase: ' + clase + '<br>' +
+        'Tipo de Arma: ' + arma + '<br>' +
+        'Acompañante: ' + companion
+    );
+
+    resumenContainer.append(resumenTitle, resumenText);
+    $('#final-container').append(resumenContainer);
 }
 
-// Función para mostrar el resumen del personaje
-function mostrarResumen(nombre, genero, clasificacionEdad, clase, arma, companion) {
-    // Crear elemento de resumen
-    let resumenContainer = document.createElement('div');
-    resumenContainer.id = 'resumen-container';
+function guardarPersonajeEnStorage(nombre, genero, edad, clase, arma, companion) {
+    // Obtener los personajes guardados del almacenamiento local
+    var personajesGuardados = JSON.parse(localStorage.getItem('personajes')) || [];
 
-    // Crear elementos de resumen
-    let resumenTitle = document.createElement('h2');
-    resumenTitle.textContent = 'Resumen del Personaje:';
-
-    let resumenText = document.createElement('p');
-    resumenText.textContent =
-        'Nombre: ' + nombre + '\n' +
-        'Género: ' + genero + '\n' +
-        'Edad: ' + clasificacionEdad + '\n' +
-        'Clase: ' + clase + '\n' +
-        'Tipo de Arma: ' + arma + '\n' +
-        'Acompañante: ' + companion;
-
-    // Agregar elementos al contenedor de resumen
-    resumenContainer.appendChild(resumenTitle);
-    resumenContainer.appendChild(resumenText);
-
-    // Obtener contenedor final y agregar el resumen
-    let finalContainer = document.getElementById('final-container');
-    finalContainer.appendChild(resumenContainer);
-}
-
-// Función para guardar datos en el almacenamiento local
-function guardarDatosEnStorage(nombre, genero, edad, clase, arma, companion) {
-    let personaje = {
+    // Crear un nuevo objeto para el personaje actual
+    var nuevoPersonaje = {
         nombre: nombre,
         genero: genero,
         edad: edad,
@@ -125,13 +132,9 @@ function guardarDatosEnStorage(nombre, genero, edad, clase, arma, companion) {
         companion: companion
     };
 
-    // Convertir a cadena JSON y guardar en el almacenamiento local
-    localStorage.setItem('personaje', JSON.stringify(personaje));
+    // Agregar el nuevo personaje al arreglo de personajes guardados
+    personajesGuardados.push(nuevoPersonaje);
+
+    // Guardar el arreglo actualizado en el almacenamiento local
+    localStorage.setItem('personajes', JSON.stringify(personajesGuardados));
 }
-
-// Ejecutar la función de inicio al cargar la página
-window.onload = function () {
-    document.getElementById('creation-container').style.display = 'none';
-    document.getElementById('final-container').style.display = 'none';
-};
-
