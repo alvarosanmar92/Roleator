@@ -1,0 +1,27 @@
+[
+    {
+      "nombre": "Guerrero Valiente",
+      "genero": "Masculino",
+      "edad": 30,
+      "clase": "Bárbaro",
+      "arma": "Espada",
+      "companion": "Lobo"
+    },
+    {
+      "nombre": "Hechicera Sabia",
+      "genero": "Femenino",
+      "edad": 25,
+      "clase": "Mago",
+      "arma": "Vara Mágica",
+      "companion": "Fénix"
+    },
+    {
+        "nombre": "Roberta Darkness",
+        "genero": "Femenino",
+        "edad": 29,
+        "clase":"Mago",
+        "arma": "Vara Mágica",
+        "companion": "Mistral"
+    }
+  ]
+  
