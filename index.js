@@ -1,129 +1,249 @@
-$(document).ready(function() {
-    $('#creation-container').hide();
-    $('#final-container').hide();
+// Cargar los datos de los personajes desde el JSON local
+function cargarDatosJSON() {
+    // Cargar personajes del JSON
+    fetch('datos.json')
+        .then(response => response.json())
+        .then(data => {
+            mostrarDatosJSON(data);
 
-    $('#crear-desde-cero').click(function() {
-        iniciarCreacion();
-    });
-
-    $('#usar-personaje').click(function() {
-        cargarPersonajes();
-    });
-
-    $('#crear-personaje').click(function() {
-        crearPersonaje();
-    });
-
-    $('#restart-button').click(function() {
-        reiniciarProceso();
-    });
-});
-
-function iniciarCreacion() {
-    $('#welcome-container').hide();
-    $('#creation-container').show();
+            // Cargar personaje creado por el usuario si existe
+            const personajeGuardado = JSON.parse(localStorage.getItem('personaje'));
+            if (personajeGuardado) {
+                data.push(personajeGuardado);
+                mostrarDatosJSON(data);
+            }
+        })
+        .catch(error => console.error('Error al cargar datos del JSON:', error));
 }
 
-function cargarPersonajes() {
-    $('#welcome-container').hide();
-    $('#use-character-container').show();
+// Mostrar los datos cargados del JSON en un div
+function mostrarDatosJSON(personajes) {
+    let datosJSONContainer = document.createElement('div');
+    datosJSONContainer.id = 'datos-json-container';
 
-    $.getJSON('personajes.json', function(data) {
-        $.each(data, function(key, personaje) {
-            var button = $('<button></button>').text(personaje.nombre).click(function() {
-                mostrarDetalles(personaje);
-            });
-            $('#characters-list').append(button);
+    let datosJSONTitle = document.createElement('h2');
+    datosJSONTitle.textContent = 'Personajes :';
+
+    let datosJSONList = document.createElement('ul');
+    personajes.forEach(personaje => {
+        let listItem = document.createElement('li');
+        listItem.textContent =
+            'Nombre: ' + personaje.nombre + ', ' +
+            'Género: ' + personaje.genero + ', ' +
+            'Edad: ' + personaje.edad + ', ' +
+            'Clase: ' + personaje.clase + ', ' +
+            'Arma: ' + personaje.arma + ', ' +
+            'Acompañante: ' + personaje.companion;
+
+        // Botón para seleccionar el personaje
+        let seleccionarButton = document.createElement('button');
+        seleccionarButton.textContent = 'Seleccionar';
+        seleccionarButton.addEventListener('click', function() {
+            mostrarPersonajeSeleccionado(personaje);
         });
+
+        listItem.appendChild(seleccionarButton);
+        datosJSONList.appendChild(listItem);
     });
+
+    datosJSONContainer.appendChild(datosJSONTitle);
+    datosJSONContainer.appendChild(datosJSONList);
+
+    // Agregar el contenedor de datos JSON al cuerpo del documento
+    document.body.appendChild(datosJSONContainer);
 }
 
-function mostrarDetalles(personaje) {
-    $('#detalles-personaje').empty();
-    $('#detalles-personaje').append('<h2>' + personaje.nombre + '</h2>');
-    $('#detalles-personaje').append('<p>Género: ' + personaje.genero + '</p>');
-    // Agregar más detalles según sea necesario (edad, clase, arma, etc.)
+// Función para mostrar el resumen del personaje seleccionado del JSON
+function mostrarPersonajeSeleccionado(personaje) {
+    // Ocultar el contenedor de bienvenida y el contenedor JSON
+    document.getElementById('welcome-container').style.display = 'none';
+    document.getElementById('datos-json-container').style.display = 'none';
+
+    // Mostrar el resumen del personaje seleccionado
+    mostrarResumen(
+        personaje.nombre,
+        personaje.genero,
+        clasificarEdad(personaje.edad),
+        personaje.clase,
+        personaje.arma,
+        personaje.companion
+    );
+
+    // Mostrar el contenedor final
+    document.getElementById('final-container').style.display = 'block';
+        // Cambiar el fondo del cuerpo de la página
+        document.body.style.backgroundImage = "url('/pathFinal.jpg')"
 }
+
+// Función principal para la creación del personaje
+function iniciarCreacion() {
+    // Ocultar el contenedor de datos del JSON
+    document.getElementById('datos-json-container').style.display = 'none';
+
+    // Mostrar el contenedor de creación de personajes
+    document.getElementById('creation-container').style.display = 'block';
+
+    //Ocultar el contenedor de inicio
+    document.getElementById('welcome-container').style.display = 'none'
+}
+
+function reiniciarProceso() {
+    // Ocultar el contenedor final
+    document.getElementById('final-container').style.display = 'none';
+
+    // Limpiar el contenido del contenedor del resumen del personaje si existe
+    let resumenContainer = document.getElementById('resumen-container');
+    if (resumenContainer) {
+        resumenContainer.innerHTML = '';
+    }
+
+    // Mostrar el contenedor de bienvenida para reiniciar el proceso
+    document.getElementById('welcome-container').style.display = 'block';
+
+    // Mostrar el contenedor de datos del JSON
+    document.getElementById('datos-json-container').style.display = 'block';
+
+    // Restaurar el fondo inicial
+    document.body.style.backgroundImage = "url('/forest.jpg')";
+
+    // Mostrar nuevamente los personajes del JSON
+    cargarDatosJSON();
+
+    // Obtener el personaje creado por el usuario
+    const personajeGuardado = JSON.parse(localStorage.getItem('personaje'));
+    if (personajeGuardado) {
+        // Agregar el personaje creado por el usuario al listado de personajes del JSON
+        fetch('datos.json')
+            .then(response => response.json())
+            .then(data => {
+                data.push(personajeGuardado);
+                mostrarDatosJSON(data);
+            })
+            .catch(error => console.error('Error al cargar datos del JSON:', error));
+    }
+
+}
+
+
 
 function crearPersonaje() {
-    var nombre = $('#nombre').val();
-    var genero = $('#genero').val();
-    var edad = parseInt($('#edad').val());
-    var clase = $('#clase').val();
-    var arma = $('#arma').val();
-    var companion = $('#companero').val();
+    // Capturar datos del usuario a través de inputs
+    let nombre = document.getElementById('nombre').value;
+    let genero = document.getElementById('genero').value;
+    let edad = parseInt(document.getElementById('edad').value);
+    let clase = document.getElementById('clase').value;
+    let arma = document.getElementById('arma').value;
+    let companion = document.getElementById('companion').value;
 
-    // Validaciones
+    // Validar opciones de género
     if (!validarGenero(genero)) {
         alert("Error: El género ingresado no es válido. Por favor, elige entre Femenino, Masculino o No Binario.");
         return;
     }
 
+    // Validar rango de edad
     if (isNaN(edad) || edad < 10 || edad > 80) {
         alert("Error: La edad ingresada no es válida. Por favor, ingresa un número entre 10 y 80.");
         return;
     }
 
+    // Validar opciones de clase
     if (!validarClase(clase)) {
         alert("Error: La clase ingresada no es válida. Por favor, elige entre Bárbaro, Samurái, Erudito, Mago, Sanador, Asesino o Bufón.");
         return;
     }
 
+    // Validar opciones de arma
     if (!validarArma(arma)) {
         alert("Error: El tipo de arma ingresado no es válido. Por favor, elige entre Espada, Arco, Vara Mágica, Daga o Martillo.");
         return;
     }
 
-    // Operaciones adicionales...
+    // Clasificar edad
+    let clasificacionEdad = clasificarEdad(edad);
 
-    mostrarResumen(nombre, genero, edad, clase, arma, companion);
+    // Mostrar resumen del personaje
+    mostrarResumen(nombre, genero, clasificacionEdad, clase, arma, companion);
 
-    // Guardar el personaje en el almacenamiento local
-    guardarPersonajeEnStorage(nombre, genero, edad, clase, arma, companion);
+    // Almacenar datos en el almacenamiento local
+    guardarDatosEnStorage(nombre, genero, edad, clase, arma, companion);
 
-    $('#creation-container').hide();
-    $('#final-container').show();
+    // Ocultar contenedor de creación
+    document.getElementById('creation-container').style.display = 'none';
+
+    // Ocultar contenedor Bienvenida
+    document.getElementById('welcome-container').style.display = 'none';
+
+    // Mostrar contenedor final
+    document.getElementById('final-container').style.display = 'block';
+
+
+
+    // Cambiar el fondo del cuerpo de la página
+    document.body.style.backgroundImage = "url('/pathFinal.jpg')";
 }
 
-function reiniciarProceso() {
-    $('#final-container').hide();
-    $('#creation-container').show();
-}
-
+// Función para validar opciones de género
 function validarGenero(genero) {
     return ["Femenino", "Masculino", "No Binario"].includes(genero);
 }
 
+// Función para validar opciones de clase
 function validarClase(clase) {
     return ["Bárbaro", "Samurái", "Erudito", "Mago", "Sanador", "Asesino", "Bufón"].includes(clase);
 }
 
+// Función para validar opciones de arma
 function validarArma(arma) {
     return ["Espada", "Arco", "Vara Mágica", "Daga", "Martillo"].includes(arma);
 }
 
-function mostrarResumen(nombre, genero, edad, clase, arma, companion) {
-    var resumenContainer = $('<div></div>').attr('id', 'resumen-container');
-    var resumenTitle = $('<h2></h2>').text('Resumen del Personaje:').css('font-weight', 'bold');
-    var resumenText = $('<p></p>').html(
-        'Nombre: ' + nombre + '<br>' +
-        'Género: ' + genero + '<br>' +
-        'Edad: ' + edad + '<br>' +
-        'Clase: ' + clase + '<br>' +
-        'Tipo de Arma: ' + arma + '<br>' +
-        'Acompañante: ' + companion
-    );
-
-    resumenContainer.append(resumenTitle, resumenText);
-    $('#final-container').append(resumenContainer);
+// Función para clasificar la edad
+function clasificarEdad(edad) {
+    if (edad >= 10 && edad <= 20) {
+        return "Adolescente";
+    } else if (edad > 20 && edad <= 35) {
+        return "Joven";
+    } else if (edad > 35 && edad <= 50) {
+        return "Senior";
+    } else if (edad > 50 && edad <= 80) {
+        return "Anciano";
+    } else {
+        return "Edad no clasificada";
+    }
 }
 
-function guardarPersonajeEnStorage(nombre, genero, edad, clase, arma, companion) {
-    // Obtener los personajes guardados del almacenamiento local
-    var personajesGuardados = JSON.parse(localStorage.getItem('personajes')) || [];
+// Función para mostrar el resumen del personaje
+function mostrarResumen(nombre, genero, clasificacionEdad, clase, arma, companion) {
+    // Crear elemento de resumen
+    let resumenContainer = document.createElement('div');
+    resumenContainer.id = 'resumen-container';
 
-    // Crear un nuevo objeto para el personaje actual
-    var nuevoPersonaje = {
+    // Crear elementos de resumen
+    let resumenTitle = document.createElement('h2');
+    resumenTitle.textContent = 'Resumen del Personaje:';
+
+    let resumenText = document.createElement('p');
+    resumenText.textContent =
+        'Nombre: ' + nombre + '\n' +
+        'Género: ' + genero + '\n' +
+        'Edad: ' + clasificacionEdad + '\n' +
+        'Clase: ' + clase + '\n' +
+        'Tipo de Arma: ' + arma + '\n' +
+        'Acompañante: ' + companion;
+
+    // Agregar elementos al contenedor de resumen
+    resumenContainer.appendChild(resumenTitle);
+    resumenContainer.appendChild(resumenText);
+
+    // Obtener contenedor final y agregar el resumen
+    let finalContainer = document.getElementById('final-container');
+    finalContainer.appendChild(resumenContainer);
+}
+
+// Función para guardar datos en el almacenamiento local
+function guardarDatosEnStorage(nombre, genero, edad, clase, arma, companion) {
+    let personaje = {
         nombre: nombre,
         genero: genero,
         edad: edad,
@@ -132,9 +252,36 @@ function guardarPersonajeEnStorage(nombre, genero, edad, clase, arma, companion)
         companion: companion
     };
 
-    // Agregar el nuevo personaje al arreglo de personajes guardados
-    personajesGuardados.push(nuevoPersonaje);
-
-    // Guardar el arreglo actualizado en el almacenamiento local
-    localStorage.setItem('personajes', JSON.stringify(personajesGuardados));
+    // Convertir a cadena JSON y guardar en el almacenamiento local
+    localStorage.setItem('personaje', JSON.stringify(personaje));
 }
+
+// Cargar los datos de los personajes desde el JSON local
+function cargarDatosDesdeJSON() {
+    return fetch('personajes.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al cargar los datos del JSON');
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+// Ejecutar la función de inicio al cargar la página
+window.onload = function () {
+    cargarDatosDesdeJSON()
+        .then(personajes => {
+            // Mostrar los datos cargados del JSON en un div
+            mostrarDatosJSON(personajes);
+        })
+        .catch(error => {
+            console.error('Error al cargar los datos del JSON:', error);
+        });
+
+    // Ocultar el contenedor de creación de personajes y el contenedor final
+    document.getElementById('creation-container').style.display = 'none';
+    document.getElementById('final-container').style.display = 'none';
+};
