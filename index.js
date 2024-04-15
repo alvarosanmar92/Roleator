@@ -72,7 +72,7 @@ function mostrarPersonajeSeleccionado(personaje) {
     // Mostrar el contenedor final
     document.getElementById('final-container').style.display = 'block';
         // Cambiar el fondo del cuerpo de la página
-        document.body.style.backgroundImage = "url('/pathFinal.jpg')"
+        document.body.style.backgroundImage = "url('pathFinal.jpg')"
 }
 
 // Función principal para la creación del personaje
@@ -104,7 +104,7 @@ function reiniciarProceso() {
     document.getElementById('datos-json-container').style.display = 'block';
 
     // Restaurar el fondo inicial
-    document.body.style.backgroundImage = "url('/forest.jpg')";
+    document.body.style.backgroundImage = "url('forest.jpg')";
 
     // Mostrar nuevamente los personajes del JSON
     cargarDatosJSON();
