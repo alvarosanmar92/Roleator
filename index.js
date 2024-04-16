@@ -1,3 +1,4 @@
+
 // Cargar los datos de los personajes desde el JSON local
 function cargarDatosJSON() {
     // Cargar personajes del JSON
@@ -137,25 +138,45 @@ function crearPersonaje() {
 
     // Validar opciones de género
     if (!validarGenero(genero)) {
-        alert("Error: El género ingresado no es válido. Por favor, elige entre Femenino, Masculino o No Binario.");
+        Swal.fire({
+            title: 'Error!',
+            text: 'El género ingresado no es válido. Por favor, elige entre Femenino, Masculino o No Binario',
+            icon: 'error',
+            confirmButtonText: 'Voy a ello'
+          });
         return;
     }
 
     // Validar rango de edad
     if (isNaN(edad) || edad < 10 || edad > 80) {
-        alert("Error: La edad ingresada no es válida. Por favor, ingresa un número entre 10 y 80.");
+        Swal.fire({
+            title: 'Error!',
+            text: 'La edad ingresada no es válida. Por favor, ingresa un número entre 10 y 80',
+            icon: 'error',
+            confirmButtonText: 'Voy a ello'
+          });
         return;
     }
 
     // Validar opciones de clase
     if (!validarClase(clase)) {
-        alert("Error: La clase ingresada no es válida. Por favor, elige entre Bárbaro, Samurái, Erudito, Mago, Sanador, Asesino o Bufón.");
+        Swal.fire({
+            title: 'Error!',
+            text: 'La clase ingresada no es válida. Por favor, elige entre Bárbaro, Samurái, Erudito, Mago, Sanador, Asesino o Bufón',
+            icon: 'error',
+            confirmButtonText: 'Voy a ello'
+          });
         return;
     }
 
     // Validar opciones de arma
     if (!validarArma(arma)) {
-        alert("Error: El tipo de arma ingresado no es válido. Por favor, elige entre Espada, Arco, Vara Mágica, Daga o Martillo.");
+        Swal.fire({
+            title: 'Error!',
+            text: 'El tipo de arma ingresado no es válido. Por favor, elige entre Espada, Arco, Vara Mágica, Daga o Martillo',
+            icon: 'error',
+            confirmButtonText: 'Voy a ello'
+          });
         return;
     }
 
